@@ -66,9 +66,10 @@ Based on these datasets calculate the average number of deaths an Avenger suffer
 ```{r}
 #?round
 #?count
-num1 <- deaths %>% count(Time)
+?filter
+num1 <- deaths %>% group_by(Died) %>% filter(Died != "NO") %>% summarise(total = n()) %>% summarise(total_num = sum(total))
 num1
-#num1
+
 sum(deaths$Time) / num1
 ```
 
