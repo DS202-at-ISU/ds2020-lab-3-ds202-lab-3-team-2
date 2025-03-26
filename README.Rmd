@@ -66,11 +66,12 @@ Based on these datasets calculate the average number of deaths an Avenger suffer
 ```{r}
 #?round
 #?count
-?filter
-num1 <- deaths %>% group_by(Died) %>% filter(Died != "NO") %>% summarise(total = n()) %>% summarise(total_num = sum(total))
+#?filter
+num1 <- deaths %>% group_by(Died) %>% filter(Died == "YES") %>% summarise(total = n()) %>% summarise(total_num = sum(total))
 num1
 
-sum(deaths$Time) / num1
+num2 <- deaths %>% group_by(Died) %>% filter(Died != "") %>% summarise(total2 = n()) %>% summarise(total_num2 = sum(total2))
+num1 / num2
 ```
 
 ## Individually
@@ -82,6 +83,12 @@ Each team member picks one of the statements in the FiveThirtyEight [analysis](h
 ### FiveThirtyEight Statement
 
 > Quote the statement you are planning to fact-check.
+
+Cole Flickinger's Quote: "I counted 89 total deaths": This is fact checked to be true from the data given.
+```{r}
+numOfDeaths <- deaths %>% group_by(Died) %>% filter(Died == "YES") %>% summarise(total = n()) %>% summarise(numOfDeaths = sum(total))
+numOfDeaths
+```
 
 ### Include the code
 
