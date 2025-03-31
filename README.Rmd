@@ -90,6 +90,27 @@ numOfDeaths <- deaths %>% group_by(Died) %>% filter(Died == "YES") %>% summarise
 numOfDeaths
 ```
 
+"The MVP of the Earth-616 Marvel Universe Avengers has to be Jocasta — an android based on Janet van Dyne and built by Ultron — who has been destroyed five times and then recovered five times."
+```{r}
+jocasta_data <- av %>% 
+  filter(str_detect(Name.Alias, "Jocasta")) %>% 
+  select(Name.Alias, starts_with("Death"), starts_with("Return"))
+
+jocasta_deaths <- sum(jocasta_data %>% select(starts_with("Death")) == "YES")
+
+jocasta_returns <- sum(jocasta_data %>% select(starts_with("Return")) == "YES")
+
+tibble(
+  Character = "Jocasta",
+  Deaths = jocasta_deaths,
+  Returns = jocasta_returns,
+  Perfect_Recovery = (jocasta_deaths == jocasta_returns)
+)
+```
+
+From the data we can clearly see that Jocasta has died and returned 5 times.
+
+
 ### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the statement

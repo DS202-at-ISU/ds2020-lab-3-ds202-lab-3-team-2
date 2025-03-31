@@ -1,4 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/orjN5TIA)
 
 <!-- README.md is generated from README.Rmd. Please edit the README.Rmd file -->
 
@@ -24,6 +23,33 @@ you are done with your submission.
 
 Extract from the data below two data sets in long form `deaths` and
 `returns`
+
+``` r
+library(ggplot2)
+library(tidyverse)
+```
+
+    ## Warning: package 'tidyverse' was built under R version 4.4.3
+
+    ## Warning: package 'tidyr' was built under R version 4.4.3
+
+    ## Warning: package 'readr' was built under R version 4.4.3
+
+    ## Warning: package 'purrr' was built under R version 4.4.3
+
+    ## Warning: package 'forcats' was built under R version 4.4.3
+
+    ## Warning: package 'lubridate' was built under R version 4.4.3
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
+    ## ✔ lubridate 1.9.4     ✔ tibble    3.2.1
+    ## ✔ purrr     1.0.4     ✔ tidyr     1.3.1
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 ``` r
 av <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/avengers/avengers.csv", stringsAsFactors = FALSE)
@@ -66,16 +92,79 @@ head(av)
     ## 5                                                      Dies in Fear Itself brought back because that's kind of the whole point. Second death in Time Runs Out has not yet returned
     ## 6                                                                                                                                                                             <NA>
 
+``` r
+av %>% 
+  select(
+    Name.Alias,
+    starts_with("Death")
+  ) %>% 
+  head()
+```
+
+    ##                    Name.Alias Death1 Death2 Death3 Death4 Death5
+    ## 1   Henry Jonathan "Hank" Pym    YES                            
+    ## 2              Janet van Dyne    YES                            
+    ## 3 Anthony Edward "Tony" Stark    YES                            
+    ## 4         Robert Bruce Banner    YES                            
+    ## 5                Thor Odinson    YES    YES                     
+    ## 6      Richard Milhouse Jones     NO
+
+``` r
+deaths <- av %>% 
+  pivot_longer(
+    starts_with("Death"),
+    names_to = "Time",
+    values_to = "Died"
+  ) %>% 
+  select(
+    URL, Name.Alias, Time, Died
+  )
+#head(deaths)
+View(deaths)
+```
+
 Get the data into a format where the five columns for Death\[1-5\] are
 replaced by two columns: Time, and Death. Time should be a number
 between 1 and 5 (look into the function `parse_number`); Death is a
 categorical variables with values “yes”, “no” and ““. Call the resulting
 data set `deaths`.
 
+``` r
+?parse_number
+```
+
+    ## starting httpd help server ... done
+
+``` r
+deaths$Time <- parse_number(deaths$Time, na = c("", "NA"))
+View(deaths)
+```
+
 Similarly, deal with the returns of characters.
 
 Based on these datasets calculate the average number of deaths an
 Avenger suffers.
+
+``` r
+#?round
+#?count
+#?filter
+num1 <- deaths %>% group_by(Died) %>% filter(Died == "YES") %>% summarise(total = n()) %>% summarise(total_num = sum(total))
+num1
+```
+
+    ## # A tibble: 1 × 1
+    ##   total_num
+    ##       <int>
+    ## 1        89
+
+``` r
+num2 <- deaths %>% group_by(Died) %>% filter(Died != "") %>% summarise(total2 = n()) %>% summarise(total_num2 = sum(total2))
+num1 / num2
+```
+
+    ##   total_num
+    ## 1 0.4587629
 
 ## Individually
 
@@ -89,6 +178,48 @@ possible.
 ### FiveThirtyEight Statement
 
 > Quote the statement you are planning to fact-check.
+
+Cole Flickinger’s Quote: “I counted 89 total deaths”: This is fact
+checked to be true from the data given.
+
+``` r
+numOfDeaths <- deaths %>% group_by(Died) %>% filter(Died == "YES") %>% summarise(total = n()) %>% summarise(numOfDeaths = sum(total))
+numOfDeaths
+```
+
+    ## # A tibble: 1 × 1
+    ##   numOfDeaths
+    ##         <int>
+    ## 1          89
+
+“The MVP of the Earth-616 Marvel Universe Avengers has to be Jocasta —
+an android based on Janet van Dyne and built by Ultron — who has been
+destroyed five times and then recovered five times.”
+
+``` r
+jocasta_data <- av %>% 
+  filter(str_detect(Name.Alias, "Jocasta")) %>% 
+  select(Name.Alias, starts_with("Death"), starts_with("Return"))
+
+jocasta_deaths <- sum(jocasta_data %>% select(starts_with("Death")) == "YES")
+
+jocasta_returns <- sum(jocasta_data %>% select(starts_with("Return")) == "YES")
+
+tibble(
+  Character = "Jocasta",
+  Deaths = jocasta_deaths,
+  Returns = jocasta_returns,
+  Perfect_Recovery = (jocasta_deaths == jocasta_returns)
+)
+```
+
+    ## # A tibble: 1 × 4
+    ##   Character Deaths Returns Perfect_Recovery
+    ##   <chr>      <int>   <int> <lgl>           
+    ## 1 Jocasta        5       5 TRUE
+
+From the data we can clearly see that Jocasta has died and returned 5
+times.
 
 ### Include the code
 
