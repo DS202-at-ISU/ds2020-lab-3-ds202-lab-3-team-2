@@ -111,6 +111,25 @@ tibble(
 From the data we can clearly see that Jocasta has died and returned 5 times.
 
 
+Sofi Gutierrez Quote: "Out of 173 listed Avengers, my analysis found that 69 had died at least one time after they joined the team"
+```{r}
+# Count the total Avengers listed in the dataset
+total_avengers <- av %>% 
+  summarise(total_listed = n())
+
+# Filter Avengers who have died at least once
+avengers_with_deaths <- av %>% 
+  filter(if_any(starts_with("Death"), ~ .x == "YES")) %>% 
+  summarise(total_died = n())
+
+# Display results and validate against the claim
+tibble(
+  Total_Listed_Avengers = total_avengers$total_listed,
+  Avengers_Who_Died_At_Least_Once = avengers_with_deaths$total_died,
+  Match_Claim = (total_avengers$total_listed == 173 && avengers_with_deaths$total_died == 69)
+)
+```
+This showing the statement is true
 ### Include the code
 
 Make sure to include the code to derive the (numeric) fact for the statement
